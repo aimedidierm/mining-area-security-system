@@ -62,7 +62,7 @@
         <div class="container mx-auto text-center">
             <h2 class="text-3xl font-bold">Protect Your Mining Area Today!</h2>
             <p class="mt-4">Implement our IoT-based security system for peace of mind.</p>
-            <a href="#" class="mt-6 inline-block bg-white text-blue-600 font-semibold py-2 px-6 rounded-lg">Get
+            <a href="/login" class="mt-6 inline-block bg-white text-blue-600 font-semibold py-2 px-6 rounded-lg">Get
                 Started</a>
         </div>
     </section>
