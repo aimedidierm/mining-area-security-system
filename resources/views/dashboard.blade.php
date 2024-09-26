@@ -7,14 +7,14 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <title>Admin Dashboard - IoT Mining Security System</title>
+    <title>Admin Dashboard - IoT based Mining Security System</title>
 </head>
 
 <body class="bg-gray-100">
 
     <header class="bg-blue-600 text-white py-4">
         <div class="flex justify-between container mx-auto text-center">
-            <h1 class="text-3xl font-bold">IoT Mining Area Security Dashboard</h1>
+            <h1 class="text-3xl font-bold">IoT based Mining Area Security Dashboard</h1>
             <a type="submit" href="/auth/logout"
                 class="bg-red-500 px-4 py-2 rounded-lg text-white font-semibold hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
                 Logout

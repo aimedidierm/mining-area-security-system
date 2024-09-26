@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @vite(['resources/css/app.css','resources/js/app.js'])
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <title>IoT Mining Area Security System</title>
+    <title>IoT based Mining Area Security System</title>
 </head>
 
 <body class="bg-gray-100">
 
     <header class="bg-blue-600 text-white py-6">
         <div class="container mx-auto text-center">
-            <h1 class="text-4xl font-bold">IoT Mining Area Security System</h1>
+            <h1 class="text-4xl font-bold">IoT based Mining Area Security System</h1>
             <p class="mt-2 text-lg">Ensuring safety with innovative technology</p>
         </div>
     </header>
@@ -69,7 +69,7 @@
 
     <footer class="bg-gray-800 text-white py-4">
         <div class="container mx-auto text-center">
-            <p>&copy; 2024 IoT Mining Security System. All rights reserved.</p>
+            <p>&copy; 2024 IoT based Mining Security System. All rights reserved.</p>
         </div>
     </footer>
 
