@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HardwareController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,4 +24,4 @@ Route::view('/login', 'login')->name('login');
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::get('/auth/logout', [AuthController::class, 'logout']);
 
-Route::view('/admin', 'dashboard')->middleware('auth');
+Route::get('/admin', [HardwareController::class, 'index'])->middleware('auth');
