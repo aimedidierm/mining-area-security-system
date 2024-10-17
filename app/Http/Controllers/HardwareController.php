@@ -27,6 +27,7 @@ class HardwareController extends Controller
             "temperature" => $request->input("temperature"),
             "humidity" => $request->input("humidity"),
             "vibration_level" => $request->input("vibration_level"),
+            "moisture_level" => $request->input("moisture_level"),
             "motion_level" => $request->input("motion_level"),
         ]);
     }

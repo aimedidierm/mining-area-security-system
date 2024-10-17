@@ -19,6 +19,7 @@ class Hardware extends Model
         'temperature',
         'humidity',
         'vibration_level',
+        'moisture_level',
         'motion_level',
     ];
 }

@@ -11,7 +11,6 @@
 </head>
 
 <body class="bg-gray-100">
-
     <header class="bg-blue-600 text-white py-4">
         <div class="flex justify-between container mx-auto text-center">
             <h1 class="text-3xl font-bold">IoT based Mining Area Security Dashboard</h1>
@@ -45,6 +44,12 @@
                 <h3 class="mt-2 font-semibold">Humidity</h3>
                 <p class="text-2xl" id="humidity">32%</p>
             </div>
+            <!-- Added soil moisture level -->
+            <div class="bg-white shadow-lg rounded-lg p-4 text-center">
+                <span class="material-icons text-blue-600 text-5xl">nature</span>
+                <h3 class="mt-2 font-semibold">Soil Moisture Level</h3>
+                <p class="text-2xl" id="moisture-level">45%</p>
+            </div>
         </div>
 
         <h3 class="text-xl font-semibold mb-2">Recent Incidents</h3>
@@ -56,6 +61,7 @@
                         <th class="px-4 py-2">Temperature (ºC)</th>
                         <th class="px-4 py-2">Humidity (%)</th>
                         <th class="px-4 py-2">Vibration Level (G)</th>
+                        <th class="px-4 py-2">Soil Moisture (%)</th>
                         <th class="px-4 py-2">Motion Status</th>
                         <th class="px-4 py-2">Timestamp</th>
                     </tr>
@@ -85,6 +91,7 @@
                     <td class="border px-4 py-2">${incident.temperature}</td>
                     <td class="border px-4 py-2">${incident.humidity}</td>
                     <td class="border px-4 py-2">${incident.vibration_level}</td>
+                    <td class="border px-4 py-2">${incident.moisture_level}%</td>
                     <td class="border px-4 py-2 ${incident.motion_level ? 'text-red-600' : ''}">${incident.motion_level ? 'Motion Detected' : 'No Motion'}</td>
                     <td class="border px-4 py-2">${new Date(incident.created_at).toLocaleString()}</td>
                 </tr>
@@ -97,6 +104,7 @@
         document.getElementById('motion-status').textContent = data[0].motion_level ? 'Motion Detected' : 'No Motion';
         document.getElementById('temperature').textContent = data[0].temperature + 'ºC';
         document.getElementById('humidity').textContent = data[0].humidity + '%';
+        document.getElementById('moisture-level').textContent = data[0].moisture_level + '%';
 
         // Chart for vibration trends
         const ctx = document.getElementById('vibrationChart').getContext('2d');

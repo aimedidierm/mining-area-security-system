@@ -26,6 +26,7 @@ class HardwareStatusRequest extends FormRequest
             "temperature" => "required|numeric",
             "humidity" => "required|numeric",
             "vibration_level" => "required|numeric",
+            "moisture_level" => "required|numeric",
             "motion_level" => "required|boolean"
         ];
     }

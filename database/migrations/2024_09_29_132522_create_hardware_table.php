@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string("temperature");
             $table->string("humidity");
             $table->string("vibration_level");
+            $table->string("moisture_level");
             $table->boolean("motion_level");
             $table->timestamps();
         });
