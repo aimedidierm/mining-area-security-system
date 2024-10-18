@@ -1,17 +1,16 @@
 #include <WiFi.h>
-#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
+#include <WiFiClientSecure.h>
 #include <LiquidCrystal_I2C.h>
 #include "DHT.h"
 
-// Wi-Fi credentials
-const char* ssid = "Balance";       // Replace with your Wi-Fi SSID
-const char* password = "balance1234"; // Replace with your Wi-Fi password
+// WiFi credentials
+const char* WIFI_SSID = "Benitha";
+const char* WIFI_PASSWORD = "07/1/20_24";
 
-// Endpoint URL
-const char* serverName = "https://0755-197-157-187-54.ngrok-free.app/api/hardware";
+// Server URL (change as needed)
+const char* SERVER_URL = "http://mining.aimedidierm.xyz/api/hardware";
 
-// Sensor and other GPIO configurations
 const int timeSeconds = 3;
 const int DHT11PIN = 23;
 const int lcdColumns = 16;
@@ -21,7 +20,14 @@ const int greenLed = 33;
 const int buzzer = 32;
 const int vibrationSensor = 25;
 const int motionSensor = 27;
+const int soilMoisturePin = 34;
+
+
+const int soilMoistureThreshold = 1500;
 const int humiHigher = 60;
+
+int soilMoistureValue = 0;
+int vibration = 0;
 
 char incidentMessage[] = "Sample";
 
@@ -33,98 +39,56 @@ unsigned long lastTrigger = 0;
 boolean startTimer = false;
 boolean motion = false;
 
-// Wi-Fi setup
-void connectToWiFi() {
-  Serial.print("Connecting to Wi-Fi...");
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.print(".");
-  }
-  Serial.println("Connected.");
-}
-
-// HTTP POST request function using WiFiClientSecure
-void sendIncidentToServer(String incidentType, float temperature, float humidity) {
-  if (WiFi.status() == WL_CONNECTED) {
-    WiFiClientSecure client;
-    client.setInsecure(); // Disable SSL certificate validation
-    
-    HTTPClient http;
-    http.begin(client, serverName); // Connect to the server using insecure client
-    http.addHeader("Content-Type", "application/json"); // Set the content type
-
-    // Create JSON payload
-    String jsonPayload = "{";
-    jsonPayload += "\"incident\": \"" + incidentType + "\",";
-    jsonPayload += "\"temperature\": " + String(temperature) + ",";
-    jsonPayload += "\"humidity\": " + String(humidity);
-    jsonPayload += "}";
-
-    // Send HTTP POST request
-    int httpResponseCode = http.POST(jsonPayload);
-
-    if (httpResponseCode > 0) {
-      String response = http.getString(); // Get the response payload
-      Serial.println(httpResponseCode);   // Print the response code
-      Serial.println(response);           // Print the response message
-    } else {
-      Serial.print("Error on sending POST: ");
-      Serial.println(httpResponseCode);
-    }
-
-    http.end(); // Close connection
-  } else {
-    Serial.println("Wi-Fi not connected");
-  }
-}
-
-// PIR sensor interrupt handler
 void IRAM_ATTR detectsMovement() {
   startTimer = true;
   lastTrigger = millis();
 }
 
 void setup() {
-  // Initialize peripherals
   dht.begin();
   lcd.init();
   lcd.backlight();
   Serial.begin(115200);
 
-  // Configure pins
   pinMode(redLed, OUTPUT);
   pinMode(greenLed, OUTPUT);
   pinMode(buzzer, OUTPUT);
   pinMode(vibrationSensor, INPUT);
   pinMode(motionSensor, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(motionSensor), detectsMovement, RISING);
-
-  // Set initial states for LEDs and buzzer
+  pinMode(soilMoisturePin, INPUT);
   digitalWrite(redLed, LOW);
   digitalWrite(greenLed, LOW);
   digitalWrite(buzzer, LOW);
 
-  // Display startup message
   lcd.setCursor(0, 0);
   lcd.print("IoT based Mining");
   lcd.setCursor(0, 1);
   lcd.print("Security System");
   delay(4000);
+  
+  connectToWiFi();
+
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("System Ready");
   delay(3000);
-
-  // Connect to Wi-Fi
-  connectToWiFi();
 }
 
 void loop() {
   now = millis();
   float humi = dht.readHumidity();
   float temp = dht.readTemperature();
+  soilMoistureValue = analogRead(soilMoisturePin);
+  vibration = digitalRead(vibrationSensor);
 
+  digitalWrite(buzzer, LOW);
+
+  if (soilMoistureValue > soilMoistureThreshold) {
+    strcpy(incidentMessage, "Soil Wet");
+    handleSoilMoistureIncident(temp, humi, soilMoistureValue);
+  }
+  
   if (digitalRead(vibrationSensor) && humi > humiHigher) {
     strcpy(incidentMessage, "Vib & Humidity");
     if (startTimer && !motion) {
@@ -160,12 +124,95 @@ void loop() {
     delay(400);
   }
 
-  // Print sensor readings to the Serial Monitor
   Serial.print("Temperature: ");
   Serial.print(temp);
   Serial.print("ºC ");
   Serial.print("Humidity: ");
-  Serial.println(humi);
+  Serial.print(humi);
+  Serial.print(" Soil Moisture: ");
+  Serial.print(soilMoistureValue);
+  Serial.print(" Vibration: ");
+  Serial.print(vibration);
+  Serial.println("");
+}
+
+void connectToWiFi() {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting to WiFi");
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Connecting to");
+  lcd.setCursor(0, 1);
+  lcd.print("Connecting to WiFi");
+
+  unsigned long startAttemptTime = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 10000) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\nConnected to WiFi");
+    Serial.print("IP Address: ");
+    Serial.println(WiFi.localIP());
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Connected, IP:");
+    lcd.setCursor(0, 1);
+    lcd.print(WiFi.localIP());
+    delay(2000);
+  } else {
+    Serial.println("\nFailed to connect to WiFi");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Failed to connect");
+    delay(2000);
+  }
+}
+
+void sendIncidentToServer(String incidentType, float temperature, float humidity) {
+  if (WiFi.status() == WL_CONNECTED) {
+    WiFiClientSecure  client; // Use WiFiClient for HTTP requests
+    client.setInsecure();
+    HTTPClient http;
+
+    String jsonPayload = "{";
+    jsonPayload += "\"incident\": \"" + incidentType + "\",";
+    jsonPayload += "\"temperature\": \"" + String(temperature) + "\",";
+    jsonPayload += "\"moisture_level\": \"" + String(soilMoistureValue) + "\",";
+    jsonPayload += "\"vibration_level\": \"" + String(vibration) + "\",";
+    jsonPayload += "\"motion_level\": " + String(motion) + ",";
+    jsonPayload += "\"humidity\": \"" + String(humidity);
+    jsonPayload += "\"}";
+
+    Serial.print("Sending JSON: ");
+    Serial.println(jsonPayload);
+
+    if (http.begin(client, "https://restroom.rwandahouseland.com")) {  // Pass WiFiClient and URL
+      http.addHeader("Content-Type", "application/json");  // Specify content type
+
+      int httpResponseCode = http.POST(jsonPayload);  // Send the POST request
+
+      // Check the response code
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+        String response = http.getString();  // Get the response payload
+        Serial.println("Response: ");
+        Serial.println(response);
+      } else {
+        Serial.print("Error on sending POST: ");
+        Serial.println(httpResponseCode);
+      }
+
+      http.end();  // End the HTTP connection
+    } else {
+      Serial.println("HTTPClient failed to begin");
+    }
+  } else {
+    Serial.println("Error: Not connected to Wi-Fi.");
+  }
 }
 
 void incidentWithoutMotion(float temp, float humi) {
@@ -199,5 +246,21 @@ void incidentWithMotion(float temp, float humi) {
   delay(500);
 
   // Send incident details to the server
+  sendIncidentToServer(incidentMessage, temp, humi);
+}
+
+void handleSoilMoistureIncident(float temp, float humi, int soilMoisture) {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(incidentMessage);
+  lcd.setCursor(0, 1);
+  lcd.print("Detected....");
+  digitalWrite(redLed, HIGH);
+  digitalWrite(greenLed, LOW);
+  delay(500);
+  digitalWrite(redLed, LOW);
+  delay(500);
+
+  // Send soil moisture incident details to the server
   sendIncidentToServer(incidentMessage, temp, humi);
 }

@@ -48,7 +48,7 @@
             <div class="bg-white shadow-lg rounded-lg p-4 text-center">
                 <span class="material-icons text-blue-600 text-5xl">nature</span>
                 <h3 class="mt-2 font-semibold">Soil Moisture Level</h3>
-                <p class="text-2xl" id="moisture-level">45%</p>
+                <p class="text-2xl" id="moisture-level">45</p>
             </div>
         </div>
 
@@ -61,7 +61,7 @@
                         <th class="px-4 py-2">Temperature (ºC)</th>
                         <th class="px-4 py-2">Humidity (%)</th>
                         <th class="px-4 py-2">Vibration Level (G)</th>
-                        <th class="px-4 py-2">Soil Moisture (%)</th>
+                        <th class="px-4 py-2">Soil Moisture</th>
                         <th class="px-4 py-2">Motion Status</th>
                         <th class="px-4 py-2">Timestamp</th>
                     </tr>
@@ -91,7 +91,7 @@
                     <td class="border px-4 py-2">${incident.temperature}</td>
                     <td class="border px-4 py-2">${incident.humidity}</td>
                     <td class="border px-4 py-2">${incident.vibration_level}</td>
-                    <td class="border px-4 py-2">${incident.moisture_level}%</td>
+                    <td class="border px-4 py-2">${incident.moisture_level}</td>
                     <td class="border px-4 py-2 ${incident.motion_level ? 'text-red-600' : ''}">${incident.motion_level ? 'Motion Detected' : 'No Motion'}</td>
                     <td class="border px-4 py-2">${new Date(incident.created_at).toLocaleString()}</td>
                 </tr>
@@ -104,7 +104,7 @@
         document.getElementById('motion-status').textContent = data[0].motion_level ? 'Motion Detected' : 'No Motion';
         document.getElementById('temperature').textContent = data[0].temperature + 'ºC';
         document.getElementById('humidity').textContent = data[0].humidity + '%';
-        document.getElementById('moisture-level').textContent = data[0].moisture_level + '%';
+        document.getElementById('moisture-level').textContent = data[0].moisture_level;
 
         // Chart for vibration trends
         const ctx = document.getElementById('vibrationChart').getContext('2d');
